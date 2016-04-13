@@ -129,7 +129,6 @@ SEXP r_valid_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_
   int n_A=INTEGER(r_n_A)[0]; 
   int m_B=INTEGER(r_m_B)[0];
   int n_B=INTEGER(r_n_B)[0];
-  int i;
   SEXP conv;
   int len=(m_A-m_B+1)*(n_A-n_B+1);
   PROTECT(conv=allocVector(REALSXP,len));
@@ -147,7 +146,6 @@ SEXP r_full_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_n
   int n_A=INTEGER(r_n_A)[0]; 
   int m_B=INTEGER(r_m_B)[0];
   int n_B=INTEGER(r_n_B)[0];
-  int i;
   SEXP conv;
   int len=(m_A+m_B-1)*(n_A+n_B-1);
   PROTECT(conv=allocVector(REALSXP,len));
