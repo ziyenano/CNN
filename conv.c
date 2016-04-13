@@ -53,26 +53,26 @@ void full_conv(double * A, double * B,int m_A, int n_A,int m_B,int n_B, \
   }
 }
 
-void full_conv2(double * A, double * B,int m_A, int n_A,int m_B,int n_B, \
-  double * C)  //mainpulate full convolution by aid of vaild mode
+void full_conv2(double * A, double * B, int m_A,\
+ int n_A,int m_B,int n_B, double * C)  
+ //mainpulate full convolution by aid of vaild mode
 {
-  int i,j;    
+  int i,j;
   int nrow=2*m_B-2+m_A;
   int ncol=2*n_B-2+n_A;
-  double expand_A[nrow*ncol];
-  // double * expand_A=(double *)calloc(nrow*ncol,sizeof(double));
+  // double expand_A[nrow*ncol];
+  double * Expand_A=(double *)calloc(nrow*ncol,sizeof(double));
   int cnt=0;
   for (i = m_B-1; i <m_A+m_B-1 ; ++i)
     {
       for (j =n_B-1; j <n_A+n_B-1; ++j)
         {
-          expand_A[i*nrow+j]=A[cnt];
+          Expand_A[i*nrow+j]=A[cnt];
           ++cnt;
         } 
     }
-  valid_conv(expand_A,B,nrow,ncol,m_B,n_B,C);
-  // free(expand_A);
-
+  valid_conv(Expand_A,B,nrow,ncol,m_B,n_B,C);
+  free(Expand_A);
 }
 
 
@@ -113,7 +113,8 @@ void valid_conv_ori(double * A, double * B,int *ma, int *na,int * mb,int * nb, \
 // // for(i=0;i<(ma-mb+1)*(na-nb+1);++i)
 // // 	printf("%5.2lf \n",c[i]);
 // double c[(ma+mb-1)*(na+nb-1)];
-// full_conv2(a,b,ma,na,mb,nb,c);
+// double expand_a[(2*mb-2+ma)*(2*nb-2+na)];
+// full_conv2(a,b,expand_a,ma,na,mb,nb,2*mb-2+ma,2*nb-2+na,c);
 // int i;
 // for(i=0;i<(ma+mb-1)*(na+nb-1);++i)
 // 	printf("%5.2lf \n",c[i]);
@@ -122,8 +123,8 @@ void valid_conv_ori(double * A, double * B,int *ma, int *na,int * mb,int * nb, \
 
 SEXP r_valid_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_n_B)
 {
-  double * A=REAL(r_A);
-  double * B=REAL(r_B);
+  double *A=REAL(r_A);
+  double *B=REAL(r_B);
   int m_A=INTEGER(r_m_A)[0]; 
   int n_A=INTEGER(r_n_A)[0]; 
   int m_B=INTEGER(r_m_B)[0];
@@ -131,19 +132,17 @@ SEXP r_valid_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_
   int i;
   SEXP conv;
   int len=(m_A-m_B+1)*(n_A-n_B+1);
-  double C[len];
-  valid_conv(A,B,m_A,n_A,m_B,n_B,C);
   PROTECT(conv=allocVector(REALSXP,len));
-  for (i = 0; i < len; ++i)
-    REAL(conv)[i]=C[i];
+  double *p=REAL(conv);
+  valid_conv(A,B,m_A,n_A,m_B,n_B,p);
   UNPROTECT(1);
   return(conv);
 }
 
 SEXP r_full_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_n_B)
 {
-  double * A=REAL(r_A);
-  double * B=REAL(r_B);
+  double *A=REAL(r_A);
+  double *B=REAL(r_B);
   int m_A=INTEGER(r_m_A)[0]; 
   int n_A=INTEGER(r_n_A)[0]; 
   int m_B=INTEGER(r_m_B)[0];
@@ -151,21 +150,12 @@ SEXP r_full_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_n
   int i;
   SEXP conv;
   int len=(m_A+m_B-1)*(n_A+n_B-1);
-  double C[len];
-  full_conv2(A,B,m_A,n_A,m_B,n_B,C);
   PROTECT(conv=allocVector(REALSXP,len));
-  for (i = 0; i < len; ++i)
-    REAL(conv)[i]=C[i];
+  double * p=REAL(conv);
+  full_conv2(A,B,m_A,n_A,m_B,n_B,p);
   UNPROTECT(1);
   return(conv);
 }
-
-
-
-
-
-
-
 
 
 
