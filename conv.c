@@ -62,9 +62,9 @@ void full_conv2(double * A, double * B,int m_A, int n_A,int m_B,int n_B, \
   double expand_A[nrow*ncol];
   // double * expand_A=(double *)calloc(nrow*ncol,sizeof(double));
   int cnt=0;
-  for (int i = m_B-1; i <m_A+m_B-1 ; ++i)
+  for (i = m_B-1; i <m_A+m_B-1 ; ++i)
     {
-      for (int j =n_B-1; j <n_A+n_B-1; ++j)
+      for (j =n_B-1; j <n_A+n_B-1; ++j)
         {
           expand_A[i*nrow+j]=A[cnt];
           ++cnt;
@@ -134,7 +134,7 @@ SEXP r_valid_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_
   double C[len];
   valid_conv(A,B,m_A,n_A,m_B,n_B,C);
   PROTECT(conv=allocVector(REALSXP,len));
-  for (int i = 0; i < len; ++i)
+  for (i = 0; i < len; ++i)
     REAL(conv)[i]=C[i];
   UNPROTECT(1);
   return(conv);
@@ -154,7 +154,7 @@ SEXP r_full_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_n
   double C[len];
   full_conv2(A,B,m_A,n_A,m_B,n_B,C);
   PROTECT(conv=allocVector(REALSXP,len));
-  for (int i = 0; i < len; ++i)
+  for (i = 0; i < len; ++i)
     REAL(conv)[i]=C[i];
   UNPROTECT(1);
   return(conv);
