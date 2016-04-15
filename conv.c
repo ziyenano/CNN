@@ -20,7 +20,7 @@ void valid_conv(double * A, double * B,int m_A, int n_A,int m_B,int n_B, \
   				//s+=1;
   			}
   		}
-  	C[i*(m_A-m_B+1)+j]=s;
+  	C[i*(n_A-n_B+1)+j]=s;
   	}
   }
 }
@@ -67,7 +67,7 @@ void full_conv2(double * A, double * B, int m_A,\
     {
       for (j =n_B-1; j <n_A+n_B-1; ++j)
         {
-          Expand_A[i*nrow+j]=A[cnt];
+          Expand_A[i*ncol+j]=A[cnt];
           ++cnt;
         } 
     }
