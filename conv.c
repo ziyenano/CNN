@@ -48,7 +48,7 @@ void full_conv(double * A, double * B,int m_A, int n_A,int m_B,int n_B, \
   				 s+=1;
   			}
   		}
-  	C[i*(m_A+m_B-1)+j]=s;
+  	C[i*(n_A+n_B-1)+j]=s;
   	}
   }
 }
@@ -95,7 +95,7 @@ void valid_conv_ori(double * A, double * B,int *ma, int *na,int * mb,int * nb, \
   				//s+=1;
   			}
   		}
-  	C[i*(m_A-m_B+1)+j]=s;
+  	C[i*(n_A-n_B+1)+j]=s;
   	}
   }
 }
