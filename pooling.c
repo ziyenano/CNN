@@ -1,4 +1,5 @@
 #include "stdio.h"
+#include "stdlib.h"
 #include "math.h"
 void max(double * A, int len, double * max_value)
 {
@@ -16,41 +17,76 @@ void avg(double * A, int len, double * avg_value)
 	int i;
 	*avg_value=0;
 	for (i = 0; i < len; ++i)
-		*avg_value+=A[i];
-	*avg_value=*avg_value/len;
+		(*avg_value)+=A[i];
+	(*avg_value)=(*avg_value)/len;
 }
 
-void fill(double *A, int m_A, double * B, int nr, int nc, int rth, int cth)
+void fill(double *A, int n_A, double * B, int nr, int nc, int rth, int cth)
 {
 	int m,n,cnt=0;
 	for (m = 0; m<nr; ++m)
 	{
 		for (n = 0; n < nc; ++n)
 		{
-			B[cnt]=A[(rth+m)*m_A+n+cth];
+			B[cnt]=A[(rth+m)*n_A+n+cth];
 			++cnt;
 		}
 	}
 }
 
-void down_sample(double * A, double * B, int mod_nr, int mod_nc, \
-	int m_A, int n_A, int nr, int nc)
+void down_sample(double * A, double * B, \
+	int m_A, int n_A, int nr, int nc,\
+	void (*f)(double *, int, double *))
 {
-   int i,j,cnt;
+   int i,j,cnt=0;
    int len=nr*nc;
-   double tmp[len];
+   int m_E_A,n_E_A;
+   double * tmp=(double *)calloc(len,sizeof(double));
+   // double tmp[len];
    double pool_value;
-   int b_cnt=0;
-   	for(i=0;i<m_A;i+=nr)
-   	{
-   		for (j = 0; j<n_A;j+=nc)
+   int mod_nr=m_A%nr;
+   int mod_nc=n_A%nc;
+   double * Expand_A;
+   ////padding the boundary if necessary
+   if(mod_nr==0 && mod_nc==0)  
+   {
+		Expand_A=A;
+		m_E_A=m_A;
+		n_E_A=n_A;
+   }
+   else
+   {
+		m_E_A=m_A-mod_nr+nr;
+		n_E_A=n_A-mod_nc+nc;
+   		Expand_A=(double *)calloc(m_E_A*n_E_A,sizeof(double));
+		for(i=0;i<m_A;++i)
+	   	{
+	   		for (j = 0; j<n_A;++j)
+	   		{
+	   			Expand_A[i*n_E_A+j]=A[cnt];
+	   			++cnt;
+	   		}
+
+	   	}	
+   }
+   ////
+
+   cnt=0;
+   
+   for(i=0;i<m_E_A;i+=nr)
+   {
+   		for (j = 0; j<n_E_A;j+=nc)
    		{
-   			fill(A,m_A,tmp,nr,nc,i,j);
-   			avg(tmp,len,&pool_value);
-   			B[b_cnt]=pool_value;
-   			++b_cnt;
+   			 fill(Expand_A,n_E_A,tmp,nr,nc,i,j);
+   			 (*f)(tmp,len,&pool_value);
+	   		 B[cnt]=pool_value;
+   			 ++cnt;
    		}
-   	}
+
+   }
+   free(tmp);
+   if(mod_nr!=0 || mod_nc!=0) 
+   free(Expand_A);
 }
 
 void up_sample(double * A, double * B, 
@@ -77,24 +113,24 @@ void up_sample(double * A, double * B,
 
 int main()
 {
-double a[]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-int ma=4,na=4;
+double a[]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25};
+int ma=5,na=5;
 int nr=2,nc=2;
-// double b[(int)(ma/nr)*(int)(na/nc)];
-// down_sample(a, b, 0,0, 
-// 	ma, na,  nr,  nc);
-// int i;
-// for(i=0;i<4;++i)
-// 	printf("%5.2lf \n",b[i]);
- double b[ma*nr*na*nc];
-up_sample(a,b,ma,na,nr,nc);
-int i,j;
- for(i=0;i<ma*nr;++i)
-	{
- 	 for(j=0;j<na*nc;++j)
-		printf("%5.2lf ",b[i*(na*nc)+j]);
-	printf("\n");
-	}
+int len=((int)(ma/nr)+1)*((int)(na/nc)+1);
+double b[len];
+down_sample(a, b,ma, na,  nr, nc,max);
+int i;
+for(i=0;i<len;++i)
+	printf("%5.2lf \n",b[i]);
+//  double b[ma*nr*na*nc];
+// up_sample(a,b,ma,na,nr,nc);
+// int i,j;
+//  for(i=0;i<ma*nr;++i)
+// 	{
+//  	 for(j=0;j<na*nc;++j)
+// 		printf("%5.2lf ",b[i*(na*nc)+j]);
+// 	printf("\n");
+// 	}
 return 0;
 }
 
