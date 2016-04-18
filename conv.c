@@ -144,7 +144,7 @@ void valid_conv_ori(double * A, double * B,int *ma, int *na,int * mb,int * nb, \
 // return 0;
 // }
 
-SEXP r_valid_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_n_B)
+SEXP r_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_n_B,SEXP r_mode)
 {
   double *A=REAL(r_A);
   double *B=REAL(r_B);
@@ -152,47 +152,45 @@ SEXP r_valid_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_
   int n_A=INTEGER(r_n_A)[0]; 
   int m_B=INTEGER(r_m_B)[0];
   int n_B=INTEGER(r_n_B)[0];
+  int mode=INTEGER(r_mode)[0];
   SEXP conv;
-  int len=(m_A-m_B+1)*(n_A-n_B+1);
-  PROTECT(conv=allocVector(REALSXP,len));
-  double *p=REAL(conv);
-  valid_conv(A,B,m_A,n_A,m_B,n_B,p);
-  UNPROTECT(1);
-  return(conv);
-}
+  double *p;
+  int len;
+  //valid mode 
+  if(mode==1) 
+  {
+    len=(m_A-m_B+1)*(n_A-n_B+1);
+    PROTECT(conv=allocVector(REALSXP,len));
+    p=REAL(conv);
+    valid_conv(A,B,m_A,n_A,m_B,n_B,p);
+    UNPROTECT(1);
+    return conv;
+  }
+  //full mode 
+  else if(mode==2)  
+  {
+    len=(m_A+m_B-1)*(n_A+n_B-1);
+    PROTECT(conv=allocVector(REALSXP,len));
+    p=REAL(conv);
+    full_conv2(A,B,m_A,n_A,m_B,n_B,p);
+    UNPROTECT(1);
+    return conv;
+  }
+  //same mode
+  else if(mode==3)  
+  {
+    len=m_A*n_A;
+    PROTECT(conv=allocVector(REALSXP,len));
+    p=REAL(conv);
+    same_conv(A,B,m_A,n_A,m_B,n_B,p);
+    UNPROTECT(1);
+    return conv;
+  }
 
-SEXP r_full_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_n_B)
-{
-  double *A=REAL(r_A);
-  double *B=REAL(r_B);
-  int m_A=INTEGER(r_m_A)[0]; 
-  int n_A=INTEGER(r_n_A)[0]; 
-  int m_B=INTEGER(r_m_B)[0];
-  int n_B=INTEGER(r_n_B)[0];
-  SEXP conv;
-  int len=(m_A+m_B-1)*(n_A+n_B-1);
-  PROTECT(conv=allocVector(REALSXP,len));
-  double * p=REAL(conv);
-  full_conv2(A,B,m_A,n_A,m_B,n_B,p);
+  PROTECT(conv=allocVector(INTSXP,1));
+  INTEGER(conv)[0]=0;
   UNPROTECT(1);
-  return(conv);
-}
-
-SEXP r_same_conv(SEXP r_A, SEXP r_B, SEXP r_m_A, SEXP r_n_A,SEXP r_m_B, SEXP r_n_B)
-{
-  double *A=REAL(r_A);
-  double *B=REAL(r_B);
-  int m_A=INTEGER(r_m_A)[0]; 
-  int n_A=INTEGER(r_n_A)[0]; 
-  int m_B=INTEGER(r_m_B)[0];
-  int n_B=INTEGER(r_n_B)[0];
-  SEXP conv;
-  int len=m_A*n_A;
-  PROTECT(conv=allocVector(REALSXP,len));
-  double * p=REAL(conv);
-  same_conv(A,B,m_A,n_A,m_B,n_B,p);
-  UNPROTECT(1);
-  return(conv);
+  return conv;
 }
 
 
