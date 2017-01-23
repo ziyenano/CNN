@@ -90,11 +90,12 @@ void down_sample(double * A, double * B, \
 }
 
 void up_sample(double * A, double * B, 
-	int m_A, int n_A, int nr, int nc)
+	int m_A, int n_A, int m_B, int n_B, int nr, int nc)
 {
 	int i,j,m,n;
-	int m_B=nr*m_A;
-	int n_B=nc*n_A;
+	int rm_B=nr*m_A-m_B;
+	int rn_B=nc*n_A-n_B;
+	
 	for(i=0;i<m_A;++i)
 	{
 		for(j=0;j<n_A;++j)
@@ -102,10 +103,11 @@ void up_sample(double * A, double * B,
 			for (m = 0; m < nr; ++m)
 			{
 				for (n = 0; n < nc; ++n)
-					B[(i*nr+m)*m_B+j*nc+n]=A[i*m_A+j];
+					B[(i*nr+m)*n_B+j*nc+n]=A[i*n_A+j];
 			}
 		}
 	}
+
 }
 
 
